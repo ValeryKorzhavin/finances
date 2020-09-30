@@ -64,8 +64,7 @@ pipeline {
     stage('Deploy to GKE') {
         agent {
             docker {
-                image 'alpine/helm:2.14.0'
-                
+                image 'dtzar/helm-kubectl:3.3.1'
             }
         }
         when {
