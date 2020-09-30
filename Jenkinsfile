@@ -48,16 +48,19 @@ pipeline {
         steps {
             script {
                 def dockerImage1 = docker.build("${env.IMAGE_NAME}/registry:${env.IMAGE_TAG}", "-f registry/${env.DOCKERFILE_NAME} $WORKSPACE/registry")
+                def dockerImage2 = docker.build("${env.IMAGE_NAME}/gateway:${env.IMAGE_TAG}", "-f gateway/${env.DOCKERFILE_NAME} $WORKSPACE/gateway")
 
                 docker.withRegistry('', 'dockerhub-creds') {
                     dockerImage1.push()
-
+                    dockerImage2.push()
                     dockerImage1.push("latest")
+                    dockerImage2.push("latest")
 
                 }
             }
             sh "docker rmi ${env.IMAGE_NAME}/registry:${env.IMAGE_TAG} docker893/registry:latest"
-            
+            sh "docker rmi ${env.IMAGE_NAME}/gateway:${env.IMAGE_TAG} docker893/gateway:latest"
+
         }
     }
 
