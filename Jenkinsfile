@@ -65,7 +65,7 @@ pipeline {
         agent {
             docker {
                 image 'alpine/helm:2.14.0'
-                args 'entrypoint=/bin/bash'
+                args '-it --entrypoint=/bin/bash'
             }
         }
         when {
