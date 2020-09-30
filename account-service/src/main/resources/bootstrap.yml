@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: account-service
+#  datasource:
+#    url: jdbc:postgresql://postgres:5432/postgres
+#    driver-class-name: org.postgresql.Driver
+#    username: user
+#    password: pass
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+  profiles:
+    active:
+      default
+  cloud:
+    config:
+      enabled: true
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://registry:8761/eureka
+
+server:
+  port: 8083

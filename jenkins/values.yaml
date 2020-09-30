@@ -1,0 +1,45 @@
+master:
+  componentName: jenkins-master
+  image: "jenkins/jenkins"
+  tag: "lts"
+
+  overwriteConfig: true
+
+  adminUser: admin
+  adminPassword: admin
+
+  installPlugins:
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - workflow-job:latest
+    - credentials-binding:latest
+    - git:latest
+    - greenballs:latest
+    - google-login:latest
+    - role-strategy:latest
+    - locale:latest
+    - docker:latest
+    - docker-pipeline:latest
+
+  servicePort: 9090
+  serviceType: NodePort
+  hostName: jenkins.192.168.99.199.nip.io
+  ingress:
+    path: /
+
+  agent:
+    enabled: true
+    image: "jenkins/jnlp-slave"
+    tag: "3.27-1"
+    #autoadjust agent resources limits
+    resources:
+      requests:
+        cpu: '50m'
+        memory: '256Mi'
+      limits:
+        cpu: '2000m'
+        memory: '4096Mi'
+
+  #to allow jenkins create slave pods
+  rbac:
+    install: true

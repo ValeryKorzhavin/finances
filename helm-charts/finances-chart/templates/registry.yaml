@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "finances-chart.registry.deployment.name" . }}
+  labels:
+    {{- include "finances-chart.labels" . | nindent 4 }}
+    tier: registry
+spec:
+  replicas: {{ .Values.registry.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "finances-chart.selectorLabels" . | nindent 6 }}
+      tier: registry
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "finances-chart.selectorLabels" . | nindent 8 }}
+        tier: registry
+    spec:
+      serviceAccountName: {{ include "finances-chart.serviceAccountName" . }}
+      containers:
+        - name: "{{ .Values.registry.container.name  }}"
+          image: "{{ .Values.registry.image.name }}:{{ .Values.registry.image.tag }}"
+          imagePullPolicy: {{ .Values.registry.image.pullPolicy }}
+          ports:
+            - containerPort: 8761
+              protocol: TCP
+          resources:
+  {{- toYaml .Values.registry.container.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "finances-chart.registry.service.name" . }}
+  labels:
+    {{- include "finances-chart.labels" . | nindent 4 }}
+    tier: registry
+spec:
+  type: {{ .Values.registry.service.type }}
+  ports:
+    - port: {{ .Values.registry.service.port }}
+      protocol:  TCP
+      targetPort: 8084
+      name: http
+  selector:
+    {{- include "finances-chart.selectorLabels" . | nindent 4 }}
+    tier: registry
+
+---
+
+  {{- if .Values.registry.hpa.enabled -}}
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include .Values.registry.hpa.name }}
+  labels:
+    {{- include "finances-chart.labels" . | nindent 4 }}
+    tier: registry
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "finances-chart.registry.deployment.name" . }}
+  minReplicas: {{ .Values.registry.hpa.minReplicas }}
+  maxReplicas: {{ .Values.registry.hpa.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.registry.hpa.targetCPUUtilizationPercentage }}
+  {{- end -}}

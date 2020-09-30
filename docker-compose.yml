@@ -1,0 +1,53 @@
+version: '2.1'
+
+services:
+  postgres:
+    image: 'postgres:latest'
+    ports:
+    - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: postgres
+
+  gateway:
+    build:
+      dockerfile: Dockerfile
+      context: ./gateway
+    container_name: gateway
+    ports:
+      - "8084:8084"
+
+  registry:
+    build:
+      dockerfile: Dockerfile
+      context: ./registry
+    container_name: registry
+    ports:
+      - "8761:8761"
+
+  config:
+    build:
+      dockerfile: Dockerfile
+      context: ./config
+    container_name: finances-config
+    ports:
+    - "8081:8081"
+
+  auth-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8082:8082"
+
+  account-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./account-service
+    container_name: account-service
+    depends_on:
+      - postgres
+    ports:
+      - "8083:8083"
